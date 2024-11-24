@@ -1,0 +1,190 @@
+openapi: 3.0.3
+info:
+  title: Inventory Service API
+  description: API for managing and retrieving inventory details for Dave's Pet Shop.
+  version: 1.0.0
+servers:
+  - url: https://api.davespetshop.com/v1
+    description: Production server
+  - url: https://staging.api.davespetshop.com/v1
+    description: Staging server
+
+paths:
+  /inventory/low-inventory-alerts:
+    get:
+      summary: Retrieve a list of products with low inventory
+      tags:
+        - Inventory Alerts
+      parameters:
+        - name: threshold
+          in: query
+          required: false
+          schema:
+            type: integer
+            description: Stock level threshold to identify low inventory products (default is 10)
+      responses:
+        '200':
+          description: A list of products with stock levels below the specified threshold
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LowInventoryAlert'
+        '400':
+          description: Invalid query parameters
+        '500':
+          description: Internal server error
+
+  /inventory/product-details/{productId}:
+    get:
+      summary: Retrieve detailed inventory information for a specific product
+      tags:
+        - Product Details
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+            description: The unique identifier of the product
+      responses:
+        '200':
+          description: Detailed inventory information for the specified product
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductInventoryDetails'
+        '404':
+          description: Product not found
+        '500':
+          description: Internal server error
+
+  /inventory/most-popular-products:
+    get:
+      summary: Retrieve the most popular products based on sales data
+      tags:
+        - Popular Products
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            description: Maximum number of products to retrieve (default is 10)
+      responses:
+        '200':
+          description: A list of the most popular products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PopularProduct'
+        '400':
+          description: Invalid query parameters
+        '500':
+          description: Internal server error
+
+  /inventory/inventory-level/{productId}:
+    get:
+      summary: Retrieve current inventory level for a specific product
+      tags:
+        - Inventory Levels
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+            description: The unique identifier of the product
+      responses:
+        '200':
+          description: Current inventory level of the specified product
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryLevel'
+        '404':
+          description: Product not found
+        '500':
+          description: Internal server error
+
+components:
+  schemas:
+    LowInventoryAlert:
+      type: object
+      properties:
+        productId:
+          type: string
+          description: The unique identifier of the product
+        productName:
+          type: string
+          description: The name of the product
+        stock:
+          type: integer
+          description: The current stock level of the product
+        warehouse:
+          type: string
+          description: The warehouse location where the product is stored
+
+    ProductInventoryDetails:
+      type: object
+      properties:
+        productId:
+          type: string
+          description: The unique identifier of the product
+        productName:
+          type: string
+          description: The name of the product
+        description:
+          type: string
+          description: A detailed description of the product
+        category:
+          type: string
+          description: The category of the product
+        price:
+          type: number
+          format: float
+          description: The price of the product
+        currency:
+          type: string
+          description: The currency of the product price (e.g., USD)
+        stock:
+          type: integer
+          description: The current stock level of the product
+        warehouse:
+          type: string
+          description: The warehouse location where the product is stored
+
+    PopularProduct:
+      type: object
+      properties:
+        productId:
+          type: string
+          description: The unique identifier of the product
+        productName:
+          type: string
+          description: The name of the product
+        salesRank:
+          type: integer
+          description: The ranking of the product based on sales
+        category:
+          type: string
+          description: The category of the product
+
+    InventoryLevel:
+      type: object
+      properties:
+        productId:
+          type: string
+          description: The unique identifier of the product
+        productName:
+          type: string
+          description: The name of the product
+        stock:
+          type: integer
+          description: The current stock level of the product
+        warehouse:
+          type: string
+          description: The warehouse location where the product is stored
